@@ -2,7 +2,7 @@ const express = require("express")
 const cors = require("cors")
 const dbConnection = require("./config/db.config")
 const combineRouter = require("./routers/index")
-
+const axios = require("axios")
 require("dotenv").config()
 
 
@@ -33,7 +33,9 @@ app.get('/api/autocomplete', async (req, res) => {
       }
     )
 
-    res.json(response.data)
+    console.log(response,'response of api autocomplete')
+
+    return res.json(response.data)
   } catch (err) {
     console.error(err)
     res.status(500).send('Error fetching autocomplete')
