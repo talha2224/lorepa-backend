@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const LocationSchema = new mongoose.Schema({
-  title: { type: String, required: true },
+  title: { type: String, required: false,default:null },
   image: { type: String, required: true },
 });
 
