@@ -92,12 +92,15 @@ const changeStatus = async (req, res) => {
       { status },
       { new: true }
     );
-    await createNotification({
-      userId: updated.userId,
-      title: `Trailer ${status}`,
-      description: `Your trailer "${trailer.title}" status has been updated to ${status}.`
-    });
-    res.status(200).json({ msg: "Status updated", data: updated });
+    if(updated){
+      await createNotification({
+        userId: updated.userId,
+        title: `Trailer ${status}`,
+        description: `Your trailer "${updated.title}" status has been updated to ${status}.`
+      });
+      res.status(200).json({ msg: "Status updated", data: updated });
+
+    }
   } catch (err) {
     res.status(500).json({ msg: "Error updating status" });
   }
