@@ -1,0 +1,108 @@
+const { BookingModel } = require("../models/booking.model");
+const { TrailerModel } = require("../models/trailer.model");
+
+const create = async (req, res) => {
+  try {
+    const {
+      user_id,
+      trailerId,
+      startDate,
+      endDate,
+      price
+    } = req.body;
+
+
+    const trailer = await TrailerModel.findById(trailerId);
+    if (!trailer) return res.status(404).json({ msg: "Trailer not found" })
+
+    const booking = await BookingModel.create({
+      user_id,
+      trailerId,
+      startDate,
+      endDate,
+      price,
+      owner_id: trailer?.userId
+    });
+
+    res.status(200).json({ msg: "Booking created successfully", data: booking });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ msg: "Internal server error", error: err.message });
+  }
+};
+
+const getAll = async (req, res) => {
+  try {
+    const bookings = await BookingModel.find().populate("trailerId").sort({ createdAt: -1 });
+    res.status(200).json({ data: bookings });
+  } catch (err) {
+    res.status(500).json({ msg: "Error fetching bookings", error: err.message });
+  }
+};
+
+const getAllForBuyer = async (req, res) => {
+  try {
+    let { id } = req.params
+    const bookings = await BookingModel.find({ user_id: id }).populate("trailerId").populate("owner_id").sort({ createdAt: -1 });
+    res.status(200).json({ data: bookings });
+  } catch (err) {
+    res.status(500).json({ msg: "Error fetching bookings", error: err.message });
+  }
+};
+const getAllForSeller = async (req, res) => {
+  try {
+    let { id } = req.params
+    const bookings = await BookingModel.find({ owner_id: id }).populate("trailerId").populate("user_id").sort({ createdAt: -1 });
+    res.status(200).json({ data: bookings });
+  } catch (err) {
+    res.status(500).json({ msg: "Error fetching bookings", error: err.message });
+  }
+};
+
+const getSingle = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const booking = await BookingModel.findById(id);
+    if (!booking) return res.status(404).json({ msg: "Booking not found" });
+    res.status(200).json({ data: booking });
+  } catch (err) {
+    res.status(500).json({ msg: "Error fetching booking", error: err.message });
+  }
+};
+
+const remove = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await BookingModel.findByIdAndDelete(id);
+    res.status(200).json({ msg: "Booking deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ msg: "Error deleting booking", error: err.message });
+  }
+};
+
+const changeStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    const updated = await BookingModel.findByIdAndUpdate(
+      id,
+      { status },
+      { new: true }
+    );
+
+    res.status(200).json({ msg: "Status updated", data: updated });
+  } catch (err) {
+    res.status(500).json({ msg: "Error updating status", error: err.message });
+  }
+};
+
+module.exports = {
+  create,
+  getAll,
+  getSingle,
+  remove,
+  changeStatus,
+  getAllForBuyer,
+  getAllForSeller
+};
