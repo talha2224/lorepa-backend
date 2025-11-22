@@ -1,4 +1,6 @@
 const { AccountModel } = require("../models/account.model");
+const { BookingModel } = require("../models/booking.model");
+const { TrailerModel } = require("../models/trailer.model");
 const bcrypt = require("bcryptjs")
 
 
@@ -94,7 +96,14 @@ const getAllAccount = async (req, res) => {
     }
 }
 
+const dashboardData = async (req, res) => {
+    let { id } = req?.params
+    let booking = await BookingModel.find({ owner_id: id }).populate("trailerId").populate("user_id")
+    let trailer = await TrailerModel.find({ userId: id })
+    return res.status(200).json({ data: { booking, trailer } })
+}
+
 const uploadPicture = async (req, res) => {
 
 }
-module.exports = { uploadPicture, createAccount, loginAccount, getAccountById, getAllAccount, deleteAccount, reactivateAccount }
+module.exports = { uploadPicture, createAccount, loginAccount, getAccountById, getAllAccount, deleteAccount, reactivateAccount, dashboardData }

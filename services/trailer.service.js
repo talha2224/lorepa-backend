@@ -1,5 +1,6 @@
 const { TrailerModel } = require("../models/trailer.model");
 const { uploadFile } = require("../utils/function");
+const { createNotification } = require("./notification.service");
 
 const create = async (req, res) => {
   try {
@@ -16,6 +17,11 @@ const create = async (req, res) => {
       files.map((file) => uploadFile(file))
     );
     const trailer = await TrailerModel.create({ latitude, longitude, userId, title, category, description, zip, dailyRate, depositRate, closedDates, city, country, images: imageUrls, });
+    await createNotification({
+      userId,
+      title: "Trailer Listing Submitted",
+      description: "Your trailer listing request has been sent to the admin for approval."
+    });
     return res.status(200).json({ msg: "Trailer created successfully", data: trailer, status: 200 });
   } catch (err) {
     console.error(err);
@@ -86,6 +92,11 @@ const changeStatus = async (req, res) => {
       { status },
       { new: true }
     );
+    await createNotification({
+      userId: updated.userId,
+      title: `Trailer ${status}`,
+      description: `Your trailer "${trailer.title}" status has been updated to ${status}.`
+    });
     res.status(200).json({ msg: "Status updated", data: updated });
   } catch (err) {
     res.status(500).json({ msg: "Error updating status" });

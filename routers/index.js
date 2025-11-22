@@ -9,8 +9,8 @@ combineRouter.use("/content", require("./content.router"));
 combineRouter.use("/ticket", require("./ticket.router"));
 combineRouter.use("/document", require("./document.router"));
 combineRouter.use("/chat", require("./chat.router"));
-
-
+combineRouter.use("/notification", require("./notification.router"));
+combineRouter.use("/transaction", require("./transaction.router"));
 
 
 
