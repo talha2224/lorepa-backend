@@ -6,7 +6,7 @@ const dbConnection = require("./config/db.config")
 const combineRouter = require("./routers/index")
 const axios = require("axios")
 const Message = require("./models/message.model")
-const Chat = require("./models/chat.model")
+const stripeRouter = require("./routers/stripe.router");
 require("dotenv").config()
 
 const app = express()
@@ -31,6 +31,8 @@ app.get('/api/autocomplete', async (req, res) => {
     res.status(500).send('Error fetching autocomplete')
   }
 })
+
+app.use("/api/v1/stripe", stripeRouter);
 
 const server = http.createServer(app)
 const io = new Server(server, { cors: { origin: "*" } })

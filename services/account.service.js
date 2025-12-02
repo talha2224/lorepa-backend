@@ -2,6 +2,8 @@ const { AccountModel } = require("../models/account.model");
 const { BookingModel } = require("../models/booking.model");
 const { TrailerModel } = require("../models/trailer.model");
 const bcrypt = require("bcryptjs")
+const { uploadFile } = require("../utils/function");
+const { createNotification } = require("./notification.service");
 
 
 const createAccount = async (req, res) => {
@@ -106,4 +108,99 @@ const dashboardData = async (req, res) => {
 const uploadPicture = async (req, res) => {
 
 }
-module.exports = { uploadPicture, createAccount, loginAccount, getAccountById, getAllAccount, deleteAccount, reactivateAccount, dashboardData }
+
+const updateAccount = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { name, phone, address } = req.body;
+
+        let user = await AccountModel.findById(id);
+        if (!user) return res.status(404).json({ msg: "User not found" });
+
+        // Handle file uploads
+        if (req.files) {
+            if (req.files.profilePicture) {
+                user.profilePicture = await uploadFile(req.files.profilePicture[0]);
+            }
+            if (req.files.licenseFrontImage) {
+                user.licenseFrontImage = await uploadFile(req.files.licenseFrontImage[0]);
+            }
+            if (req.files.licenseBackImage) {
+                user.licenseBackImage = await uploadFile(req.files.licenseBackImage[0]);
+            }
+        }
+
+        user.name = name || user.name;
+        user.phone = phone || user.phone;
+        user.address = address || user.address;
+
+        await user.save();
+        return res.status(200).json({ data: user, msg: "Profile updated successfully" });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ msg: "Internal Server Error" });
+    }
+};
+
+// --- Update KYC Status ---
+const updateKYC = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { kycVerified } = req.body;
+
+    let user = await AccountModel.findByIdAndUpdate(
+      id,
+      { kycVerified },
+      { new: true }
+    );
+
+    if (!user) {
+      return res.status(404).json({ msg: "User not found" });
+    }
+
+    // create notification
+    await createNotification({
+      userId: id,
+      title: kycVerified ? "KYC Approved" : "KYC Declined",
+      description: kycVerified
+        ? "Your KYC verification has been approved."
+        : "Your KYC request has been declined. Please upload valid documents."
+    });
+
+    return res.status(200).json({ data: user, msg: "KYC status updated successfully" });
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ msg: "Internal Server Error" });
+  }
+};
+
+
+
+const changePassword = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { currentPassword, newPassword } = req.body;
+
+        const user = await AccountModel.findById(id);
+        if (!user) return res.status(404).json({ msg: "User not found" });
+
+        const isMatch = await bcrypt.compare(currentPassword, user.password);
+        if (!isMatch) return res.status(400).json({ msg: "Current password is incorrect" });
+
+        user.password = await bcrypt.hash(newPassword, 10);
+        await user.save();
+
+        return res.status(200).json({ msg: "Password changed successfully", data: null });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ msg: "Internal Server Error" });
+    }
+};
+
+
+module.exports = {
+    uploadPicture, createAccount, loginAccount, getAccountById, getAllAccount,
+    deleteAccount, reactivateAccount, dashboardData, updateAccount, updateKYC,
+    changePassword
+};

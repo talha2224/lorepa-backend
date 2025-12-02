@@ -6,7 +6,6 @@ const create = async (req, res) => {
   try {
     const { latitude, longitude, userId, title, category, description, zip, dailyRate, depositRate, city, country, closedDates } = req.body;
     const files = req.files;
-    console.log(files, 'files')
     if (!files || files.length === 0) {
       return res.status(400).json({ msg: "At least 1 image is required" });
     }

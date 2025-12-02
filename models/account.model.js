@@ -5,11 +5,15 @@ const AccountSchema = mongoose.Schema({
   password: { type: String, required: true },
   name: { type: String, required: true },
   phone: { type: String, required: true },
-  role: { type: String, enum: ['owner', 'renter'], required: true },
+  profilePicture: { type: String, default: "" },
+  kycVerified: { type: Boolean, default: false },
+  address: { type: String, default: "" },
+  licenseFrontImage: { type: String, default: "" },
+  licenseBackImage: { type: String, default: "" },
+  role: { type: String, enum: ["owner", "renter"], required: true },
   accountBlocked: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now },
 });
 
 const AccountModel = mongoose.model("Account", AccountSchema, "Account");
-
 module.exports = { AccountModel };

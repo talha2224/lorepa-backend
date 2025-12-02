@@ -23,6 +23,7 @@ const create = async (req, res) => {
       startDate,
       endDate,
       price,
+      total_paid:price,
       owner_id: trailer?.userId
     });
 
@@ -160,6 +161,45 @@ const changeStatus = async (req, res) => {
   }
 };
 
+const requestChange = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { startDate, endDate, notes } = req.body;
+
+    const booking = await BookingModel.findById(id).populate("trailerId");
+    if (!booking) return res.status(404).json({ msg: "Booking not found" });
+
+    // Update booking
+    booking.startDate = startDate;
+    booking.endDate = endDate;
+    booking.notes = notes || "";
+    booking.status = "pending"; // reset to pending
+    await booking.save();
+
+    // Notifications for both parties
+    await createNotification({
+      userId: booking.user_id,
+      title: "Booking Change Requested",
+      description: `Your request to modify booking dates for "${booking.trailerId.title}" has been submitted.`
+    });
+
+    await createNotification({
+      userId: booking.owner_id,
+      title: "Booking Change Request",
+      description: `The renter has requested new booking dates for your trailer "${booking.trailerId.title}".`
+    });
+
+    res.status(200).json({
+      msg: "Change request submitted",
+      data: booking
+    });
+
+  } catch (err) {
+    res.status(500).json({ msg: "Error requesting change", error: err.message });
+  }
+};
+
+
 module.exports = {
   create,
   getAll,
@@ -167,5 +207,6 @@ module.exports = {
   remove,
   changeStatus,
   getAllForBuyer,
-  getAllForSeller
+  getAllForSeller,
+  requestChange
 };
