@@ -12,7 +12,10 @@ router.get("/all",getAllAccount)
 router.put("/update/:id", multipleupload.fields([
   { name: "profilePicture", maxCount: 1 },
   { name: "licenseFrontImage", maxCount: 1 },
-  { name: "licenseBackImage", maxCount: 1 }
+  { name: "licenseBackImage", maxCount: 1 },
+  { name: "trailerRegistrationImage", maxCount: 1 },
+  { name: "trailerInsurancePolicyImage", maxCount: 1 },
+  { name: "carInsurancePolicyImage", maxCount: 1 }
 ]), updateAccount);
 router.put("/kyc/:id", updateKYC);
 router.put("/change-password/:id", changePassword);

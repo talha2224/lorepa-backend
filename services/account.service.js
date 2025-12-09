@@ -128,6 +128,15 @@ const updateAccount = async (req, res) => {
             if (req.files.licenseBackImage) {
                 user.licenseBackImage = await uploadFile(req.files.licenseBackImage[0]);
             }
+            if (req.files.trailerInsurancePolicyImage) {
+                user.trailerInsurancePolicyImage = await uploadFile(req.files.trailerInsurancePolicyImage[0]);
+            }
+            if (req.files.carInsurancePolicyImage) {
+                user.carInsurancePolicyImage = await uploadFile(req.files.carInsurancePolicyImage[0]);
+            }
+            if (req.files.trailerRegistrationImage) {
+                user.trailerRegistrationImage = await uploadFile(req.files.trailerRegistrationImage[0]);
+            }
         }
 
         user.name = name || user.name;
