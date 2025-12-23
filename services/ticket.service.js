@@ -62,3 +62,15 @@ exports.sendMessage = async (req, res) => {
         return res.status(500).json({ msg: "Error sending message" });
     }
 };
+
+exports.getAll = async (req, res) => {
+    try {
+        const tickets = await Ticket.find()
+            .sort({ createdAt: -1 });
+            .populate("userId");
+
+        return res.status(200).json({ data: tickets });
+    } catch (err) {
+        return res.status(500).json({ msg: "Error fetching all tickets", error: err.message });
+    }
+};
