@@ -66,7 +66,7 @@ exports.sendMessage = async (req, res) => {
 exports.getAll = async (req, res) => {
     try {
         const tickets = await Ticket.find()
-            .sort({ createdAt: -1 });
+            .sort({ createdAt: -1 })
             .populate("userId");
 
         return res.status(200).json({ data: tickets });
