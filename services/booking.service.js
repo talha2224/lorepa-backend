@@ -52,7 +52,7 @@ const create = async (req, res) => {
 
 const getAll = async (req, res) => {
   try {
-    const bookings = await BookingModel.find().populate("trailerId").sort({ createdAt: -1 });
+    const bookings = await BookingModel.find().populate("trailerId").populate("owner_id").populate("user_id").sort({ createdAt: -1 });
     res.status(200).json({ data: bookings });
   } catch (err) {
     res.status(500).json({ msg: "Error fetching bookings", error: err.message });
