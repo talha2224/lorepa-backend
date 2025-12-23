@@ -8,7 +8,7 @@ const messageSchema = new mongoose.Schema({
 });
 
 const ticketSchema = new mongoose.Schema({
-    userId: { type: String, required: true },
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: "Account", required: true },
     userType: { type: String, enum: ["Guest", "Host"], required: true },
     subject: { type: String, required: true },
     category: { type: String, required: true },
