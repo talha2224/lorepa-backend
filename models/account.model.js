@@ -20,6 +20,9 @@ const AccountSchema = mongoose.Schema({
   role: { type: String, enum: ["owner", "renter"], required: true },
   accountBlocked: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now },
+
+  otp: { type: Number, default: null },
+  otpVerified: { type: Boolean, default: false },
 });
 
 const AccountModel = mongoose.model("Account", AccountSchema, "Account");

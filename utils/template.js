@@ -28,17 +28,17 @@ module.exports = {
               </div>
               <div>
                 <p>Hi <strong>${name},</strong></p>
-                <p>Your otp for NGOC account verification is ${otp} </p>
+                <p>Your otp for Lorepa account is ${otp} </p>
               </div>
-              <p style='color:#333333'>Our team is always here to help. If you have any questions or need further assistance, contact us via email at <span style='color:#41ccad;cursor:pointer;text-decoration: none;'>support@ngoc.com</span></p>
+              <p style='color:#333333'>Our team is always here to help. If you have any questions or need further assistance, contact us via email at <span style='color:#41ccad;cursor:pointer;text-decoration: none;'>support@Lorepa.com</span></p>
               <div>
                 <p>Best Regards,</p>
               </div>
               <div>
-                <p>NGOC Team</p>
+                <p>Lorepa Team</p>
               </div>
                 <div style='text-align: center;'>
-                  <p style='color:#A3A9BB;font-size:0.7rem;'>© 2025 NGOC Analytics Inc. All rights reserved.</p>
+                  <p style='color:#A3A9BB;font-size:0.7rem;'>© 2025 Lorepa Analytics Inc. All rights reserved.</p>
                 </div>
               </div>
       

@@ -1,6 +1,6 @@
 const router = require("express").Router()
 const { multipleupload } = require("../config/multer.config")
-const { createAccount, loginAccount, getAccountById, getAllAccount, deleteAccount,reactivateAccount, dashboardData,updateAccount,updateKYC, changePassword} = require("../services/account.service")
+const { createAccount, loginAccount, getAccountById, getAllAccount, deleteAccount,reactivateAccount, dashboardData,updateAccount,updateKYC, changePassword, resendOtp, verifyOtp, changePasswordByEmail} = require("../services/account.service")
 
 router.post("/register",createAccount)
 router.post("/login",loginAccount)
@@ -19,5 +19,8 @@ router.put("/update/:id", multipleupload.fields([
 ]), updateAccount);
 router.put("/kyc/:id", updateKYC);
 router.put("/change-password/:id", changePassword);
+router.post("/send/otp/:email",resendOtp)
+router.post("/verify/otp",verifyOtp)
+router.put("/change-password-email/:email", changePasswordByEmail);
 
 module.exports = router

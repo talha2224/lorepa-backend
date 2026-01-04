@@ -4,6 +4,7 @@ const { TrailerModel } = require("../models/trailer.model");
 const bcrypt = require("bcryptjs")
 const { uploadFile } = require("../utils/function");
 const { createNotification } = require("./notification.service");
+const { sendDynamicMail } = require("../utils/email");
 
 
 const createAccount = async (req, res) => {
@@ -112,7 +113,7 @@ const uploadPicture = async (req, res) => {
 const updateAccount = async (req, res) => {
     try {
         const { id } = req.params;
-        const { name, phone, address,street,state,country } = req.body;
+        const { name, phone, address, street, state, country } = req.body;
 
         let user = await AccountModel.findById(id);
         if (!user) return res.status(404).json({ msg: "User not found" });
@@ -143,7 +144,7 @@ const updateAccount = async (req, res) => {
         user.phone = phone || user.phone;
         user.address = address || user.address;
         user.street = street || street
-        user.state=state|| user.state
+        user.state = state || user.state
         user.country = country || user.country
 
         await user.save();
@@ -156,35 +157,35 @@ const updateAccount = async (req, res) => {
 
 // --- Update KYC Status ---
 const updateKYC = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { kycVerified } = req.body;
+    try {
+        const { id } = req.params;
+        const { kycVerified } = req.body;
 
-    let user = await AccountModel.findByIdAndUpdate(
-      id,
-      { kycVerified },
-      { new: true }
-    );
+        let user = await AccountModel.findByIdAndUpdate(
+            id,
+            { kycVerified },
+            { new: true }
+        );
 
-    if (!user) {
-      return res.status(404).json({ msg: "User not found" });
+        if (!user) {
+            return res.status(404).json({ msg: "User not found" });
+        }
+
+        // create notification
+        await createNotification({
+            userId: id,
+            title: kycVerified ? "KYC Approved" : "KYC Declined",
+            description: kycVerified
+                ? "Your KYC verification has been approved."
+                : "Your KYC request has been declined. Please upload valid documents."
+        });
+
+        return res.status(200).json({ data: user, msg: "KYC status updated successfully" });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ msg: "Internal Server Error" });
     }
-
-    // create notification
-    await createNotification({
-      userId: id,
-      title: kycVerified ? "KYC Approved" : "KYC Declined",
-      description: kycVerified
-        ? "Your KYC verification has been approved."
-        : "Your KYC request has been declined. Please upload valid documents."
-    });
-
-    return res.status(200).json({ data: user, msg: "KYC status updated successfully" });
-
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ msg: "Internal Server Error" });
-  }
 };
 
 
@@ -210,9 +211,80 @@ const changePassword = async (req, res) => {
     }
 };
 
+const resendOtp = async (req, res) => {
+    try {
+        let { email } = req.params
+        let user = await AccountModel.findOne({ email: email })
+        if (!user) {
+            return res.status(400).json({ data: null, msg: "Account not exits", code: 400 })
+        }
+        else {
+            let name = user?.name?.length > 0 ? user?.name : "anonymous"
+            let pin = generatePin()
+            await sendDynamicMail("forget", email, name, pin);
+            await AccountModel.findByIdAndUpdate(user?._id, { otp: pin }, { new: true })
+            return res.status(200).json({ data: null, msg: "OTP send sucessfully", code: 200 })
+
+        }
+    }
+    catch (error) {
+        console.log(error)
+    }
+}
+
+const verifyOtp = async (req, res) => {
+    try {
+        let { email, otp } = req.body
+        let user = await AccountModel.findOne({ email: email })
+        if (!user) {
+            return res.status(400).json({ data: null, msg: "Account not exits", code: 400 })
+        }
+        else {
+            if (otp == user?.otp) {
+                await AccountModel.findByIdAndUpdate(user?._id, { otp: null, otpVerified: true }, { new: true })
+                return res.status(200).json({ data: user, msg: "Otp Verified", code: 200 })
+            }
+            else {
+                return res.status(403).json({ msg: "Invalid Otp", code: 403 })
+            }
+
+        }
+    }
+    catch (error) {
+        console.log(error)
+    }
+}
+
+const changePasswordByEmail = async (req, res) => {
+  try {
+    const { email } = req.params;
+    const { newPassword } = req.body;
+
+    if (!newPassword) return res.status(400).json({ msg: "New password is required" });
+
+    const user = await AccountModel.findOne({ email });
+    if (!user) return res.status(404).json({ msg: "User not found" });
+
+    // Optional: Ensure user has verified OTP before allowing password change
+    if (!user.otpVerified) return res.status(403).json({ msg: "OTP not verified" });
+
+    user.password = await bcrypt.hash(newPassword, 10);
+    await user.save();
+
+    return res.status(200).json({ msg: "Password changed successfully" });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ msg: "Internal Server Error" });
+  }
+};
+
+
 
 module.exports = {
     uploadPicture, createAccount, loginAccount, getAccountById, getAllAccount,
     deleteAccount, reactivateAccount, dashboardData, updateAccount, updateKYC,
-    changePassword
+    changePassword,
+    resendOtp,
+    verifyOtp,
+    changePasswordByEmail
 };
