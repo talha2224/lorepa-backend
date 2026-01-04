@@ -4,7 +4,29 @@ const { createNotification } = require("./notification.service");
 
 const create = async (req, res) => {
   try {
-    const { latitude, longitude, userId, title, category, description, zip, dailyRate, depositRate, city, country, closedDates } = req.body;
+    const {
+  latitude,
+  longitude,
+  userId,
+  title,
+  category,
+  description,
+  zip,
+  dailyRate,
+  depositRate,
+  city,
+  country,
+  closedDates,
+  hitchType,
+  lightPlug,
+  weightCapacity,
+  make,
+  model,
+  year,
+  length,
+  ballSize,
+  dimensions
+} = req.body;
     const files = req.files;
     if (!files || files.length === 0) {
       return res.status(400).json({ msg: "At least 1 image is required" });
@@ -15,7 +37,15 @@ const create = async (req, res) => {
     const imageUrls = await Promise.all(
       files.map((file) => uploadFile(file))
     );
-    const trailer = await TrailerModel.create({ latitude, longitude, userId, title, category, description, zip, dailyRate, depositRate, closedDates, city, country, images: imageUrls, });
+    const trailer = await TrailerModel.create({ latitude, longitude, userId, title, category, description, zip, dailyRate, depositRate, closedDates, city, country, images: imageUrls,hitchType,
+  lightPlug,
+  weightCapacity,
+  make,
+  model,
+  year,
+  length,
+  ballSize,
+  dimensions });
     await createNotification({
       userId,
       title: "Trailer Listing Submitted",
