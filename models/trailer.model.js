@@ -15,6 +15,15 @@ const trailerSchema = new mongoose.Schema({
     depositRate: { type: Number, default: 0 },
     status: { type: String, default: "Pending" },
     isVisible: { type: Boolean, default: true },
+    hitchType: { type: String },
+    lightPlug: { type: String },
+    weightCapacity: { type: String },
+    make: { type: String },
+    model: { type: String },
+    year: { type: Number },
+    length: { type: String },
+    ballSize: { type: String },
+    dimensions: { type: String },
     createdAt: { type: Date, default: Date.now }
 });
 
