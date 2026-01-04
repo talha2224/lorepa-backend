@@ -2,7 +2,7 @@ const { AccountModel } = require("../models/account.model");
 const { BookingModel } = require("../models/booking.model");
 const { TrailerModel } = require("../models/trailer.model");
 const bcrypt = require("bcryptjs")
-const { uploadFile } = require("../utils/function");
+const { uploadFile, generatePin } = require("../utils/function");
 const { createNotification } = require("./notification.service");
 const { sendDynamicMail } = require("../utils/email");
 
