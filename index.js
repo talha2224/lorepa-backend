@@ -32,6 +32,28 @@ app.get('/api/autocomplete', async (req, res) => {
   }
 })
 
+app.get('/api/place-details', async (req, res) => {
+  try {
+    const { placeId } = req.query;
+
+    const response = await axios.get(
+      'https://maps.googleapis.com/maps/api/place/details/json',
+      {
+        params: {
+          place_id: placeId,
+          key: GOOGLE_API_KEY,
+          fields: 'geometry,address_component'
+        }
+      }
+    );
+
+    res.json(response.data);
+  } catch (err) {
+    res.status(500).json({ error: 'Error fetching place details' });
+  }
+});
+
+
 app.use("/api/v1/stripe", stripeRouter);
 
 const server = http.createServer(app)
