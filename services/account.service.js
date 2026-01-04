@@ -112,7 +112,7 @@ const uploadPicture = async (req, res) => {
 const updateAccount = async (req, res) => {
     try {
         const { id } = req.params;
-        const { name, phone, address } = req.body;
+        const { name, phone, address,street,state,country } = req.body;
 
         let user = await AccountModel.findById(id);
         if (!user) return res.status(404).json({ msg: "User not found" });
@@ -142,6 +142,9 @@ const updateAccount = async (req, res) => {
         user.name = name || user.name;
         user.phone = phone || user.phone;
         user.address = address || user.address;
+        user.street = street || street
+        user.state=state|| user.state
+        user.country = country || user.country
 
         await user.save();
         return res.status(200).json({ data: user, msg: "Profile updated successfully" });
