@@ -8,6 +8,10 @@ const AccountSchema = mongoose.Schema({
   profilePicture: { type: String, default: "" },
   kycVerified: { type: Boolean, default: false },
   address: { type: String, default: "" },
+  state: { type: String, default: "" },
+  country: { type: String, default: "" },
+  street: { type: String, default: "" },
+
   licenseFrontImage: { type: String, default: "" },
   licenseBackImage: { type: String, default: "" },
   carInsurancePolicyImage: { type: String, default: "" },
