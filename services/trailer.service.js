@@ -138,41 +138,57 @@ const changeStatus = async (req, res) => {
 const update = async (req, res) => {
   try {
     const { id } = req.params;
-    const { latitude, longitude, title, category, description, zip, dailyRate, depositRate, city, country, closedDates, existingImages } = req.body;
-    let trailer = await TrailerModel.findById(id);
+    const {
+      latitude,
+      longitude,
+      title,
+      category,
+      description,
+      zip,
+      dailyRate,
+      depositRate,
+      city,
+      country,
+      closedDates,
+      existingImages, // array of image URLs that the user wants to keep
+    } = req.body;
+
+    const trailer = await TrailerModel.findById(id);
     if (!trailer) return res.status(404).json({ msg: "Trailer not found" });
 
-    // Handle images
+    // Start with existing images on the DB
     let newImages = trailer.images || [];
 
-    // Remove images that user deleted
-    if (existingImages) {
+    // Keep only images that user wants to retain
+    if (Array.isArray(existingImages)) {
       newImages = newImages.filter(img => existingImages.includes(img));
     } else {
+      // If no existingImages provided, assume user wants to remove all old images
       newImages = [];
     }
 
     // Upload new images if provided
     if (req.files && req.files.length > 0) {
-      if (newImages.length + req.files.length > 4)
+      if (newImages.length + req.files.length > 4) {
         return res.status(400).json({ msg: "Maximum 4 images allowed" });
+      }
 
       const uploaded = await Promise.all(req.files.map(file => uploadFile(file)));
       newImages = [...newImages, ...uploaded];
     }
 
-    // Update trailer
-    trailer.latitude = latitude;
-    trailer.longitude = longitude;
-    trailer.title = title;
-    trailer.category = category;
-    trailer.description = description;
-    trailer.zip = zip;
-    trailer.dailyRate = dailyRate;
-    trailer.depositRate = depositRate;
-    trailer.city = city;
-    trailer.country = country;
-    trailer.closedDates = closedDates;
+    // Update trailer fields
+    trailer.latitude = latitude ?? trailer.latitude;
+    trailer.longitude = longitude ?? trailer.longitude;
+    trailer.title = title ?? trailer.title;
+    trailer.category = category ?? trailer.category;
+    trailer.description = description ?? trailer.description;
+    trailer.zip = zip ?? trailer.zip;
+    trailer.dailyRate = dailyRate ?? trailer.dailyRate;
+    trailer.depositRate = depositRate ?? trailer.depositRate;
+    trailer.city = city ?? trailer.city;
+    trailer.country = country ?? trailer.country;
+    trailer.closedDates = closedDates ?? trailer.closedDates;
     trailer.images = newImages;
 
     await trailer.save();
