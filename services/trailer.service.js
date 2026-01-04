@@ -150,29 +150,33 @@ const update = async (req, res) => {
       city,
       country,
       closedDates,
-      existingImages, // array of image URLs that the user wants to keep
+      existingImages, // array of image URLs to keep
+      hitchType,
+      lightPlug,
+      weightCapacity,
+      make,
+      model,
+      year,
+      length,
+      ballSize,
+      dimensions
     } = req.body;
 
     const trailer = await TrailerModel.findById(id);
     if (!trailer) return res.status(404).json({ msg: "Trailer not found" });
 
-    // Start with existing images on the DB
+    // Handle images
     let newImages = trailer.images || [];
-
-    // Keep only images that user wants to retain
     if (Array.isArray(existingImages)) {
       newImages = newImages.filter(img => existingImages.includes(img));
     } else {
-      // If no existingImages provided, assume user wants to remove all old images
       newImages = [];
     }
 
-    // Upload new images if provided
     if (req.files && req.files.length > 0) {
       if (newImages.length + req.files.length > 4) {
         return res.status(400).json({ msg: "Maximum 4 images allowed" });
       }
-
       const uploaded = await Promise.all(req.files.map(file => uploadFile(file)));
       newImages = [...newImages, ...uploaded];
     }
@@ -191,6 +195,17 @@ const update = async (req, res) => {
     trailer.closedDates = closedDates ?? trailer.closedDates;
     trailer.images = newImages;
 
+    // Update new fields
+    trailer.hitchType = hitchType ?? trailer.hitchType;
+    trailer.lightPlug = lightPlug ?? trailer.lightPlug;
+    trailer.weightCapacity = weightCapacity ?? trailer.weightCapacity;
+    trailer.make = make ?? trailer.make;
+    trailer.model = model ?? trailer.model;
+    trailer.year = year ?? trailer.year;
+    trailer.length = length ?? trailer.length;
+    trailer.ballSize = ballSize ?? trailer.ballSize;
+    trailer.dimensions = dimensions ?? trailer.dimensions;
+
     await trailer.save();
 
     res.status(200).json({ msg: "Trailer updated successfully", data: trailer });
@@ -199,6 +214,7 @@ const update = async (req, res) => {
     res.status(500).json({ msg: "Something went wrong", error: err.message });
   }
 };
+
 
 
 module.exports = {
