@@ -30,7 +30,7 @@ module.exports = {
                 <p>Hi <strong>${name},</strong></p>
                 <p>Your otp for Lorepa account is ${otp} </p>
               </div>
-              <p style='color:#333333'>Our team is always here to help. If you have any questions or need further assistance, contact us via email at <span style='color:#41ccad;cursor:pointer;text-decoration: none;'>support@Lorepa.com</span></p>
+              <p style='color:#333333'>Our team is always here to help. If you have any questions or need further assistance, contact us via email at <span style='color:#41ccad;cursor:pointer;text-decoration: none;'>contact@lorepa.ca</span></p>
               <div>
                 <p>Best Regards,</p>
               </div>
