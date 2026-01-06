@@ -22,7 +22,7 @@ const selectTemplate = (emailType, name,otp) => {
 
 const sendDynamicMail = async (mailType, email, name,otp) => {
     try {
-        let transporter = await nodeMailer.createTransport({ host: "smtp.gmail.com", port: 465, secure: true,auth: { user:"Vpngocanh77@gmail.com", pass:"poutxfajidxdozzx", } });
+        let transporter = await nodeMailer.createTransport({ host: "smtp.gmail.com", port: 465, secure: true,auth: { user:"contact@lorepa.ca", pass:"gnrleqrzgircmden", } });
         let html = await selectTemplate(mailType, name,otp);
         mailOptions = { from: "<no-reply@lorepa.com>", to: email, subject: getSubject(mailType), html: html };
         await transporter.sendMail(mailOptions);
