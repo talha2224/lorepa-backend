@@ -2,7 +2,7 @@ const router = require("express").Router();
 const { create, getAll, getSingle, remove, changeStatus, getAllApproved, getAllBySeller, update } = require("../services/trailer.service");
 const { multipleupload } = require("../config/multer.config");
 
-router.post("/create", multipleupload.array('images',4), create);
+router.post("/create", multipleupload.array('images',10), create);
 router.get("/all", getAll);
 router.get("/all/approved", getAllApproved);
 router.get("/single/:id", getSingle);
